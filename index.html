@@ -27,7 +27,6 @@
             position: relative;
         }
 
-        /* كانفاس المحرك ثلاثي الأبعاد Three.js */
         #webgl-canvas {
             position: fixed;
             top: 0;
@@ -113,7 +112,6 @@
         }
     </style>
 
-    <!-- استدعاء مكتبة Three.js الخاصة بالرسوميات ثلاثية الأبعاد -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
@@ -149,7 +147,6 @@
     </div>
 
     <script>
-        // إعداد المشهد ثلاثي الأبعاد
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true, antialias: true });
@@ -157,43 +154,41 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // 1. إنشاء النجوم المتحركة
-        const starsCount = 300;
+        // 1. زيادة عدد النجوم وجعلها كروية الشكل
+        const starsCount = 450;
         const starGeo = new THREE.BufferGeometry();
         const starPos = new Float32Array(starsCount * 3);
-        const starSpeeds = [];
 
         for(let i = 0; i < starsCount * 3; i += 3) {
-            starPos[i] = (Math.random() - 0.5) * 40;
-            starPos[i+1] = (Math.random() - 0.5) * 40;
-            starPos[i+2] = (Math.random() - 0.5) * 40;
-            starSpeeds.push(Math.random() * 0.01 + 0.002);
+            starPos[i] = (Math.random() - 0.5) * 35;
+            starPos[i+1] = (Math.random() - 0.5) * 35;
+            starPos[i+2] = (Math.random() - 0.5) * 35;
         }
 
         starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
         const starMat = new THREE.PointsMaterial({
             color: 0xffffff,
-            size: 0.08,
+            size: 0.09,
             transparent: true,
-            opacity: 0.8
+            opacity: 0.85
         });
         const starMesh = new THREE.Points(starGeo, starMat);
         scene.add(starMesh);
 
-        // 2. إنشاء الأشكال الهندسية الشبكية ثلاثية الأبعاد (Icosahedrons & Octahedrons)
+        // 2. زيادة عدد الأشكال الهندسية تسريع حركتها (28 شكل هندسي)
         const shapesGroup = new THREE.Group();
-        const shapesCount = 14;
+        const shapesCount = 28;
         const shapes = [];
 
         const purpleMaterial = new THREE.MeshBasicMaterial({
-            color: 0x9333ea,
+            color: 0xa855f7,
             wireframe: true,
             transparent: true,
-            opacity: 0.45
+            opacity: 0.5
         });
 
         for(let i = 0; i < shapesCount; i++) {
-            const size = Math.random() * 0.8 + 0.4;
+            const size = Math.random() * 0.75 + 0.35;
             const geo = Math.random() > 0.5 
                 ? new THREE.IcosahedronGeometry(size, 0) 
                 : new THREE.OctahedronGeometry(size, 0);
@@ -201,8 +196,8 @@
             const mesh = new THREE.Mesh(geo, purpleMaterial);
             
             mesh.position.set(
-                (Math.random() - 0.5) * 20,
-                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 22,
+                (Math.random() - 0.5) * 22,
                 (Math.random() - 0.5) * 15
             );
 
@@ -212,10 +207,12 @@
                 Math.random() * Math.PI
             );
 
+            // تسريع سرعة الدوران والحركة التفاعلية
             const speed = {
-                rotX: (Math.random() - 0.5) * 0.01,
-                rotY: (Math.random() - 0.5) * 0.01,
-                moveY: (Math.random() - 0.5) * 0.005
+                rotX: (Math.random() - 0.5) * 0.035,
+                rotY: (Math.random() - 0.5) * 0.035,
+                moveY: (Math.random() - 0.5) * 0.015,
+                moveX: (Math.random() - 0.5) * 0.015
             };
 
             shapes.push({ mesh, speed });
@@ -225,33 +222,29 @@
 
         camera.position.z = 10;
 
-        // تحديث أبعاد الكاميرا عند تغيير حجم الشاشة
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // حركة وتدوير العناصر ثلاثية الأبعاد
         function animate() {
             requestAnimationFrame(animate);
 
-            // دوران وتفاعل النجوم
-            const positions = starGeo.attributes.position.array;
-            for(let i = 1; i < starsCount * 3; i += 3) {
-                positions[i] -= 0.005;
-                if(positions[i] < -20) positions[i] = 20;
-            }
-            starGeo.attributes.position.needsUpdate = true;
+            // تدوير مجرة النجوم بأكملها جهة اليسار (مثل الكرة الأرضية)
+            starMesh.rotation.y += 0.003;
 
-            // دوران وتصاعد الأشكال ثلاثية الأبعاد
+            // حركة وتدوير الأشكال الهندسية البنفسجية بسرعة أكبر
             shapes.forEach(item => {
                 item.mesh.rotation.x += item.speed.rotX;
                 item.mesh.rotation.y += item.speed.rotY;
                 item.mesh.position.y += item.speed.moveY;
+                item.mesh.position.x += item.speed.moveX;
 
-                if(item.mesh.position.y > 10) item.mesh.position.y = -10;
-                if(item.mesh.position.y < -10) item.mesh.position.y = 10;
+                if(item.mesh.position.y > 12) item.mesh.position.y = -12;
+                if(item.mesh.position.y < -12) item.mesh.position.y = 12;
+                if(item.mesh.position.x > 12) item.mesh.position.x = -12;
+                if(item.mesh.position.x < -12) item.mesh.position.x = 12;
             });
 
             renderer.render(scene, camera);
