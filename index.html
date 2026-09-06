@@ -154,71 +154,64 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // 1. زيادة عدد النجوم وجعلها كروية الشكل
-        const starsCount = 450;
+        // 1. إنشاء حقل النجوم المضيئة
+        const starsCount = 600;
         const starGeo = new THREE.BufferGeometry();
         const starPos = new Float32Array(starsCount * 3);
 
         for(let i = 0; i < starsCount * 3; i += 3) {
-            starPos[i] = (Math.random() - 0.5) * 35;
-            starPos[i+1] = (Math.random() - 0.5) * 35;
-            starPos[i+2] = (Math.random() - 0.5) * 35;
+            starPos[i] = (Math.random() - 0.5) * 40;
+            starPos[i+1] = (Math.random() - 0.5) * 40;
+            starPos[i+2] = (Math.random() - 0.5) * 40;
         }
 
         starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
         const starMat = new THREE.PointsMaterial({
             color: 0xffffff,
-            size: 0.09,
+            size: 0.08,
             transparent: true,
             opacity: 0.85
         });
         const starMesh = new THREE.Points(starGeo, starMat);
         scene.add(starMesh);
 
-        // 2. زيادة عدد الأشكال الهندسية تسريع حركتها (28 شكل هندسي)
-        const shapesGroup = new THREE.Group();
-        const shapesCount = 28;
-        const shapes = [];
-
-        const purpleMaterial = new THREE.MeshBasicMaterial({
-            color: 0xa855f7,
-            wireframe: true,
+        // 2. إنشاء النيازك والشهب المتساقطة المضيئة
+        const meteors = [];
+        const meteorMat = new THREE.LineBasicMaterial({
+            color: 0xebd5ff,
             transparent: true,
-            opacity: 0.5
+            opacity: 0.8
         });
 
-        for(let i = 0; i < shapesCount; i++) {
-            const size = Math.random() * 0.75 + 0.35;
-            const geo = Math.random() > 0.5 
-                ? new THREE.IcosahedronGeometry(size, 0) 
-                : new THREE.OctahedronGeometry(size, 0);
+        function createMeteor() {
+            const geometry = new THREE.BufferGeometry();
+            const points = [
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(-1.2, 0.6, -0.4) // ذيل الشهاب
+            ];
+            geometry.setFromPoints(points);
 
-            const mesh = new THREE.Mesh(geo, purpleMaterial);
-            
-            mesh.position.set(
-                (Math.random() - 0.5) * 22,
-                (Math.random() - 0.5) * 22,
-                (Math.random() - 0.5) * 15
+            const line = new THREE.Line(geometry, meteorMat);
+            line.position.set(
+                Math.random() * 30 - 10,
+                Math.random() * 20 + 5,
+                (Math.random() - 0.5) * 10
             );
 
-            mesh.rotation.set(
-                Math.random() * Math.PI,
-                Math.random() * Math.PI,
-                Math.random() * Math.PI
-            );
-
-            // تسريع سرعة الدوران والحركة التفاعلية
-            const speed = {
-                rotX: (Math.random() - 0.5) * 0.035,
-                rotY: (Math.random() - 0.5) * 0.035,
-                moveY: (Math.random() - 0.5) * 0.015,
-                moveX: (Math.random() - 0.5) * 0.015
-            };
-
-            shapes.push({ mesh, speed });
-            shapesGroup.add(mesh);
+            scene.add(line);
+            meteors.push({
+                mesh: line,
+                speedX: -0.25 - Math.random() * 0.15,
+                speedY: -0.15 - Math.random() * 0.1
+            });
         }
-        scene.add(shapesGroup);
+
+        // إطلاق نيزك كل فترة زمنية
+        setInterval(() => {
+            if (meteors.length < 5) {
+                createMeteor();
+            }
+        }, 1200);
 
         camera.position.z = 10;
 
@@ -231,21 +224,21 @@
         function animate() {
             requestAnimationFrame(animate);
 
-            // تدوير مجرة النجوم بأكملها جهة اليسار (مثل الكرة الأرضية)
-            starMesh.rotation.y += 0.003;
+            // دوران شبكة النجوم نحو اليسار مثل دوران الأرض
+            starMesh.rotation.y += 0.0035;
 
-            // حركة وتدوير الأشكال الهندسية البنفسجية بسرعة أكبر
-            shapes.forEach(item => {
-                item.mesh.rotation.x += item.speed.rotX;
-                item.mesh.rotation.y += item.speed.rotY;
-                item.mesh.position.y += item.speed.moveY;
-                item.mesh.position.x += item.speed.moveX;
+            // تحريك النيازك واختفائها عند الخروج من الشاشة
+            for (let i = meteors.length - 1; i >= 0; i--) {
+                const m = meteors[i];
+                m.mesh.position.x += m.speedX;
+                m.mesh.position.y += m.speedY;
 
-                if(item.mesh.position.y > 12) item.mesh.position.y = -12;
-                if(item.mesh.position.y < -12) item.mesh.position.y = 12;
-                if(item.mesh.position.x > 12) item.mesh.position.x = -12;
-                if(item.mesh.position.x < -12) item.mesh.position.x = 12;
-            });
+                if (m.mesh.position.x < -20 || m.mesh.position.y < -15) {
+                    scene.remove(m.mesh);
+                    m.mesh.geometry.dispose();
+                    meteors.splice(i, 1);
+                }
+            }
 
             renderer.render(scene, camera);
         }
