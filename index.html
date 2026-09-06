@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rosa Makup</title>
 
-    <!-- استدعاء خط Poppins والأيقونات -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -18,18 +17,17 @@
         }
 
         body {
-            background-color: #06050e; /* نفس لون الخلفية الليلكي الداكن للفيديو */
+            background-color: #06050e;
             color: #ffffff;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden;
+            overflow: hidden;
             position: relative;
         }
 
-        /* حاوية جزيئات الخلفية المتحركة */
-        #tsparticles {
+        #bgCanvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -39,7 +37,6 @@
             pointer-events: none;
         }
 
-        /* الحاوية الرئيسية للمحتوى */
         .container {
             position: relative;
             z-index: 2;
@@ -56,7 +53,6 @@
             margin-bottom: 20px;
         }
 
-        /* اللوكو الدائري بالإطار المضيء */
         .profile-img {
             width: 140px;
             height: 140px;
@@ -75,7 +71,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* الأزرار الزجاجية الشفافة */
         .btn-group {
             width: 100%;
             display: flex;
@@ -88,7 +83,7 @@
             width: 100%;
             padding: 15px 20px;
             border-radius: 30px;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #ffffff;
             text-decoration: none;
@@ -104,7 +99,7 @@
         }
 
         .btn:hover {
-            background: rgba(168, 85, 247, 0.2);
+            background: rgba(168, 85, 247, 0.25);
             border-color: #a855f7;
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(168, 85, 247, 0.4);
@@ -116,22 +111,14 @@
             font-weight: 400;
         }
     </style>
-
-    <!-- استدعاء مكتبة tsparticles الرسمية والخفيفة للحركات الهندسية -->
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles-engine@2.12.0/tsparticles.engine.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles-basic@2.12.0/tsparticles.basic.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles-shape-polygon@2.12.0/tsparticles.shape.polygon.min.js"></script>
 </head>
 <body>
 
-    <!-- حاوية محرك الجزيئات والأشكال -->
-    <div id="tsparticles"></div>
+    <canvas id="bgCanvas"></canvas>
 
-    <!-- محتوى الصفحة -->
     <div class="container">
-        
         <div class="profile-container">
-            <img src="logo.png" alt="Rosa Logo" class="profile-img">
+            <img src="rosa-logo.png" alt="Rosa Logo" class="profile-img">
         </div>
 
         <h1 class="name">Rosa Makup</h1>
@@ -147,73 +134,116 @@
                 <i class="fab fa-instagram"></i> Instagram
             </a>
             <a href="tel:07700000000" class="btn">
-                <i class="fas fa-phone"></i> Call 
+                <i class="fas fa-phone"></i> Call Al-Mansour
             </a>
-            
+            <a href="tel:07700000000" class="btn">
+                <i class="fas fa-phone"></i> Call Al-Adhamiya
+            </a>
         </div>
 
         <p class="footer-text">RosaMakupIQ❤️</p>
     </div>
 
-    <!-- برمجة وحركة الأشكال والنجوم تماماً كالفيديو -->
     <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-            await tsParticles.load("tsparticles", {
-                fpsLimit: 60,
-                particles: {
-                    number: {
-                        value: 25, /* عدد الأشكال والنجوم */
-                        density: { enable: true, area: 800 }
-                    },
-                    color: {
-                        value: ["#ffffff", "#8b5cf6", "#a855f7"] /* ألوان الأشكال البنفسجية والأبيض */
-                    },
-                    shape: {
-                        type: ["circle", "polygon"], /* دمج النجوم والأشكال الهندسية */
-                        options: {
-                            polygon: [
-                                { sides: 6 }, /* شكل سداسي كريستالي */
-                                { sides: 4 }  /* شكل معيّن هندسي */
-                            ]
-                        }
-                    },
-                    opacity: {
-                        value: { min: 0.15, max: 0.6 },
-                        animation: {
-                            enable: true,
-                            speed: 1,
-                            sync: false
-                        }
-                    },
-                    size: {
-                        value: { min: 3, max: 22 }, /* مقاسات متفاوتة للأشكال */
-                        animation: {
-                            enable: true,
-                            speed: 2,
-                            sync: false
-                        }
-                    },
-                    rotate: {
-                        value: { min: 0, max: 360 },
-                        direction: "random",
-                        animation: {
-                            enable: true,
-                            speed: 4 /* حركة دوران الأشكال الهندسية */
-                        }
-                    },
-                    move: {
-                        enable: true,
-                        speed: 0.8, /* سرعة الطوفان الهادئة والسلسة */
-                        direction: "none",
-                        random: true,
-                        straight: false,
-                        outModes: { default: "out" }
-                    }
-                },
-                detectRetina: true
-            });
-        });
-    </script>
+        (function() {
+            const canvas = document.getElementById('bgCanvas');
+            const ctx = canvas.getContext('2d');
 
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const stars = Array.from({ length: 70 }, () => ({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: Math.random() * 2 + 0.5,
+                alpha: Math.random(),
+                speed: Math.random() * 0.015 + 0.005
+            }));
+
+            const shapes = Array.from({ length: 16 }, () => ({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: Math.random() * 22 + 12,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                angle: Math.random() * Math.PI * 2,
+                vRot: (Math.random() - 0.5) * 0.015,
+                isHex: Math.random() > 0.5
+            }));
+
+            function drawHexagon(c, s) {
+                c.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const a = (Math.PI / 3) * i;
+                    const x = s * Math.cos(a);
+                    const y = s * Math.sin(a);
+                    if (i === 0) c.moveTo(x, y);
+                    else c.lineTo(x, y);
+                }
+                c.closePath();
+                c.stroke();
+                c.beginPath();
+                c.moveTo(-s, 0); c.lineTo(s, 0);
+                c.stroke();
+            }
+
+            function drawDiamond(c, s) {
+                c.beginPath();
+                c.moveTo(0, -s);
+                c.lineTo(s * 0.75, 0);
+                c.lineTo(0, s);
+                c.lineTo(-s * 0.75, 0);
+                c.closePath();
+                c.stroke();
+                c.beginPath();
+                c.moveTo(-s * 0.75, 0); c.lineTo(s * 0.75, 0);
+                c.moveTo(0, -s); c.lineTo(0, s);
+                c.stroke();
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                stars.forEach(st => {
+                    st.alpha += st.speed;
+                    if (st.alpha > 1 || st.alpha < 0) st.speed = -st.speed;
+                    ctx.fillStyle = 'rgba(255, 255, 255, ' + Math.abs(st.alpha) + ')';
+                    ctx.beginPath();
+                    ctx.arc(st.x, st.y, st.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                shapes.forEach(sp => {
+                    sp.x += sp.vx;
+                    sp.y += sp.vy;
+                    sp.angle += sp.vRot;
+
+                    if (sp.x < -40) sp.x = canvas.width + 40;
+                    if (sp.x > canvas.width + 40) sp.x = -40;
+                    if (sp.y < -40) sp.y = canvas.height + 40;
+                    if (sp.y > canvas.height + 40) sp.y = -40;
+
+                    ctx.save();
+                    ctx.translate(sp.x, sp.y);
+                    ctx.rotate(sp.angle);
+                    ctx.strokeStyle = 'rgba(168, 85, 247, 0.5)';
+                    ctx.lineWidth = 1.4;
+
+                    if (sp.isHex) drawHexagon(ctx, sp.size);
+                    else drawDiamond(ctx, sp.size);
+
+                    ctx.restore();
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        })();
+    </script>
 </body>
 </html>
