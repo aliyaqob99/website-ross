@@ -17,13 +17,13 @@
         }
 
         body {
-            background-color: #06050e;
+            background-color: #080612;
             color: #ffffff;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
         }
 
@@ -54,14 +54,14 @@
         }
 
         .profile-img {
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
             object-fit: contain;
             border: 2px solid rgba(168, 85, 247, 0.7);
             background-color: #ffffff;
             padding: 4px;
-            box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
         }
 
         .name {
@@ -83,7 +83,7 @@
             width: 100%;
             padding: 15px 20px;
             border-radius: 30px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #ffffff;
             text-decoration: none;
@@ -156,58 +156,72 @@
             resize();
             window.addEventListener('resize', resize);
 
-            const stars = Array.from({ length: 70 }, () => ({
+            // 1. النجوم البيضاء المضيئة
+            const stars = Array.from({ length: 120 }, () => ({
                 x: Math.random() * window.innerWidth,
                 y: Math.random() * window.innerHeight,
-                size: Math.random() * 2 + 0.5,
+                size: Math.random() * 1.8 + 0.3,
                 alpha: Math.random(),
-                speed: Math.random() * 0.015 + 0.005
+                speed: Math.random() * 0.02 + 0.005
             }));
 
-            const shapes = Array.from({ length: 16 }, () => ({
+            // 2. الأشكال الهندسية ثلاثية الأبعاد (مكعبات وبلورات بنفسجية)
+            const shapes = Array.from({ length: 18 }, () => ({
                 x: Math.random() * window.innerWidth,
                 y: Math.random() * window.innerHeight,
-                size: Math.random() * 22 + 12,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: (Math.random() - 0.5) * 0.5,
+                size: Math.random() * 25 + 15,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
                 angle: Math.random() * Math.PI * 2,
-                vRot: (Math.random() - 0.5) * 0.015,
-                isHex: Math.random() > 0.5
+                vRot: (Math.random() - 0.5) * 0.012,
+                type: Math.floor(Math.random() * 3)
             }));
 
-            function drawHexagon(c, s) {
+            // رسم مكعب ثلاثي الأبعاد شبيهاً بالفيديو
+            function drawCube(c, size) {
                 c.beginPath();
+                // المضلع الخارجي
                 for (let i = 0; i < 6; i++) {
                     const a = (Math.PI / 3) * i;
-                    const x = s * Math.cos(a);
-                    const y = s * Math.sin(a);
+                    const x = size * Math.cos(a);
+                    const y = size * Math.sin(a);
                     if (i === 0) c.moveTo(x, y);
                     else c.lineTo(x, y);
                 }
                 c.closePath();
                 c.stroke();
+
+                // خطوط الأبعاد الداخلية للمكعب
                 c.beginPath();
-                c.moveTo(-s, 0); c.lineTo(s, 0);
+                c.moveTo(0, 0); c.lineTo(0, size);
+                c.moveTo(0, 0); c.lineTo(size * Math.cos(Math.PI / 6), -size * Math.sin(Math.PI / 6));
+                c.moveTo(0, 0); c.lineTo(-size * Math.cos(Math.PI / 6), -size * Math.sin(Math.PI / 6));
                 c.stroke();
             }
 
-            function drawDiamond(c, s) {
+            // رسم أشكال معينة وهندسية متداخلة
+            function drawIcoShape(c, size) {
                 c.beginPath();
-                c.moveTo(0, -s);
-                c.lineTo(s * 0.75, 0);
-                c.lineTo(0, s);
-                c.lineTo(-s * 0.75, 0);
+                c.moveTo(0, -size);
+                c.lineTo(size * 0.8, -size * 0.3);
+                c.lineTo(size * 0.8, size * 0.5);
+                c.lineTo(0, size);
+                c.lineTo(-size * 0.8, size * 0.5);
+                c.lineTo(-size * 0.8, -size * 0.3);
                 c.closePath();
                 c.stroke();
+
                 c.beginPath();
-                c.moveTo(-s * 0.75, 0); c.lineTo(s * 0.75, 0);
-                c.moveTo(0, -s); c.lineTo(0, s);
+                c.moveTo(0, -size); c.lineTo(0, size);
+                c.moveTo(-size * 0.8, -size * 0.3); c.lineTo(size * 0.8, size * 0.5);
+                c.moveTo(size * 0.8, -size * 0.3); c.lineTo(-size * 0.8, size * 0.5);
                 c.stroke();
             }
 
             function animate() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+                // رسم النجوم
                 stars.forEach(st => {
                     st.alpha += st.speed;
                     if (st.alpha > 1 || st.alpha < 0) st.speed = -st.speed;
@@ -217,24 +231,29 @@
                     ctx.fill();
                 });
 
+                // رسم الأشكال ثلاثية الأبعاد
                 shapes.forEach(sp => {
                     sp.x += sp.vx;
                     sp.y += sp.vy;
                     sp.angle += sp.vRot;
 
-                    if (sp.x < -40) sp.x = canvas.width + 40;
-                    if (sp.x > canvas.width + 40) sp.x = -40;
-                    if (sp.y < -40) sp.y = canvas.height + 40;
-                    if (sp.y > canvas.height + 40) sp.y = -40;
+                    if (sp.x < -50) sp.x = canvas.width + 50;
+                    if (sp.x > canvas.width + 50) sp.x = -50;
+                    if (sp.y < -50) sp.y = canvas.height + 50;
+                    if (sp.y > canvas.height + 50) sp.y = -50;
 
                     ctx.save();
                     ctx.translate(sp.x, sp.y);
                     ctx.rotate(sp.angle);
-                    ctx.strokeStyle = 'rgba(168, 85, 247, 0.5)';
-                    ctx.lineWidth = 1.4;
+                    
+                    // لون الخطوط والبريق التلقائي
+                    ctx.strokeStyle = 'rgba(168, 85, 247, 0.6)';
+                    ctx.lineWidth = 1.2;
+                    ctx.shadowColor = '#a855f7';
+                    ctx.shadowBlur = 10;
 
-                    if (sp.isHex) drawHexagon(ctx, sp.size);
-                    else drawDiamond(ctx, sp.size);
+                    if (sp.type === 0) drawCube(ctx, sp.size);
+                    else drawIcoShape(ctx, sp.size);
 
                     ctx.restore();
                 });
