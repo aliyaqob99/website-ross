@@ -23,11 +23,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden;
+            overflow: hidden;
             position: relative;
         }
 
-        #webgl-canvas {
+        #starCanvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -105,18 +105,18 @@
             box-shadow: 0 5px 20px rgba(168, 85, 247, 0.4);
         }
 
-        /* إيماء التلاشي والظهور التدريجي للنص السفلي */
+        /* إيماء اختفاء وظهور تدريجي للنص السفلي */
         .footer-text {
             font-size: 0.95rem;
             color: #d0d0e0;
             font-weight: 400;
-            animation: pulseFade 3.5s ease-in-out infinite;
+            animation: pulseFade 3s ease-in-out infinite;
         }
 
         @keyframes pulseFade {
             0% {
                 opacity: 0.15;
-                transform: scale(0.97);
+                transform: scale(0.96);
             }
             50% {
                 opacity: 1;
@@ -125,16 +125,14 @@
             }
             100% {
                 opacity: 0.15;
-                transform: scale(0.97);
+                transform: scale(0.96);
             }
         }
     </style>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <canvas id="webgl-canvas"></canvas>
+    <canvas id="starCanvas"></canvas>
 
     <div class="container">
         <div class="profile-container">
@@ -165,108 +163,112 @@
     </div>
 
     <script>
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true, antialias: true });
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        let w, h;
 
-        // 1. توليد النجوم 3D المتحركة لليسار
-        const starsCount = 600;
-        const starGeo = new THREE.BufferGeometry();
-        const starPos = new Float32Array(starsCount * 3);
+        function setSize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        setSize();
+        window.addEventListener('resize', setSize);
 
-        for(let i = 0; i < starsCount * 3; i += 3) {
-            starPos[i] = (Math.random() - 0.5) * 50;
-            starPos[i+1] = (Math.random() - 0.5) * 50;
-            starPos[i+2] = (Math.random() - 0.5) * 30;
+        // 1. توليد النجوم التي تتحرك لليسار
+        const numStars = 300;
+        const stars = [];
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                r: Math.random() * 1.3 + 0.3,
+                speed: Math.random() * 0.4 + 0.1,
+                alpha: Math.random() * 0.8 + 0.2
+            });
         }
 
-        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-        const starMat = new THREE.PointsMaterial({
-            color: 0xffffff,
-            size: 0.09,
-            transparent: true,
-            opacity: 0.9
-        });
-        const starMesh = new THREE.Points(starGeo, starMat);
-        scene.add(starMesh);
-
-        // 2. توليد الشهب والنيازك ثلاثية الأبعاد الواقعية
+        // 2. توليد النيازك المضيئة الواقعية
         const meteors = [];
 
         function spawnMeteor() {
-            const meteorGeo = new THREE.BufferGeometry();
-            const points = [
-                new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(2.5, -1.2, 0)
-            ];
-            meteorGeo.setFromPoints(points);
-
-            const meteorMat = new THREE.LineBasicMaterial({
-                color: 0xd8b4fe,
-                transparent: true,
-                opacity: 1
-            });
-
-            const line = new THREE.Line(meteorGeo, meteorMat);
-            line.position.set(
-                Math.random() * 25 - 5,
-                Math.random() * 12 + 4,
-                (Math.random() - 0.5) * 10
-            );
-
-            scene.add(line);
             meteors.push({
-                mesh: line,
-                material: meteorMat,
-                speedX: -0.22,
-                speedY: -0.11,
-                opacity: 1
+                x: Math.random() * (w + 200),
+                y: Math.random() * (h * 0.4) - 50,
+                len: Math.random() * 110 + 70,
+                speed: Math.random() * 8 + 5,
+                alpha: 1,
+                size: Math.random() * 1.5 + 1
             });
         }
 
         setInterval(() => {
-            if (meteors.length < 3 && Math.random() < 0.75) {
+            if (meteors.length < 3 && Math.random() < 0.8) {
                 spawnMeteor();
             }
         }, 1800);
 
-        camera.position.z = 10;
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+            // رسم وحركة النجوم أفقياً نحو اليسار
+            for (let i = 0; i < stars.length; i++) {
+                let s = stars[i];
+                s.x -= s.speed;
 
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // دوران حقل النجوم بهدوء جهة اليسار
-            starMesh.rotation.y += 0.0018;
-
-            // تحريك وتلاشي النيازك
-            for (let i = meteors.length - 1; i >= 0; i--) {
-                const m = meteors[i];
-                m.mesh.position.x += m.speedX;
-                m.mesh.position.y += m.speedY;
-                m.opacity -= 0.012;
-                m.material.opacity = m.opacity;
-
-                if (m.opacity <= 0 || m.mesh.position.x < -20) {
-                    scene.remove(m.mesh);
-                    m.mesh.geometry.dispose();
-                    m.material.dispose();
-                    meteors.splice(i, 1);
+                if (s.x < 0) {
+                    s.x = w;
+                    s.y = Math.random() * h;
                 }
+
+                ctx.fillStyle = rgba(255, 255, 255, ${s.alpha});
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                ctx.fill();
             }
 
-            renderer.render(scene, camera);
+            // رسم النيازك الذكية ذات التوهج
+            for (let i = meteors.length - 1; i >= 0; i--) {
+                let m = meteors[i];
+
+                m.x -= m.speed;
+                m.y += m.speed * 0.5;
+                m.alpha -= 0.008;
+
+                if (m.alpha <= 0 || m.x < -150 || m.y > h + 150) {
+                    meteors.splice(i, 1);
+                    continue;
+                }
+
+                let tailX = m.x + m.len;
+                let tailY = m.y - m.len * 0.5;
+
+                let grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+                grad.addColorStop(0, rgba(255, 255, 255, ${m.alpha}));
+                grad.addColorStop(0.3, rgba(192, 132, 252, ${m.alpha * 0.8}));
+                grad.addColorStop(1, 'rgba(147, 51, 234, 0)');
+
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = m.size;
+                ctx.lineCap = 'round';
+
+                ctx.beginPath();
+                ctx.moveTo(m.x, m.y);
+                ctx.lineTo(tailX, tailY);
+                ctx.stroke();
+
+                // توهج رأس النيزك
+                ctx.fillStyle = rgba(255, 255, 255, ${m.alpha});
+                ctx.beginPath();
+                ctx.arc(m.x, m.y, m.size * 1.2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            requestAnimationFrame(draw);
         }
 
-        animate();
+        draw();
     </script>
 </body>
 </html>
