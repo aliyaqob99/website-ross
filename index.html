@@ -1,13 +1,39 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rosa Makeup</title><link rel="stylesheet" href="style.css"></head><body>
-<div class="space"><div class="stars"></div><div class="orbits"></div>
-  <div class="float lipstick">💄</div><div class="float brush">🖌️</div><div class="float heart">💗</div><div class="float star s1">★</div><div class="float star s2">★</div><div class="float star s3">★</div>
-  <main><div class="logoWrap"><img src="logo.png" class="logo"><div class="ring"></div></div><h1>Rosa Makeup</h1>
-    <section class="links">
-      <a href="https://wa.me/" target="_blank">◉ <span>Whatsapp</span></a>
-      <a href="#">f <span>Facebook</span></a>
-      <a href="#">◎ <span>Instagram</span></a>
-      <a href="tel:">☎ <span>Call Al-Mansour</span></a>
-      <a href="tel:">☎ <span>Call Al-Adhamiya</span></a>
-    </section><div class="footer">RosaMakeup <b>♥</b></div>
-  </main>
-</div><script>document.querySelectorAll('.links a').forEach(a=>a.addEventListener('pointerdown',()=>a.classList.add('tap')));</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rosa Makeup — Makeup & Perfumes</title>
+<meta name="theme-color" content="#080b16">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="aurora"></div><div class="grain"></div>
+<div class="scene" aria-hidden="true"><i class="star s1"></i><i class="star s2"></i><i class="star s3"></i><i class="star s4"></i><i class="star s5"></i><i class="star s6"></i><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="ring r1"></span><span class="ring r2"></span></div>
+<main class="page">
+  <header class="brand">
+    <div class="logo-wrap"><div class="logo-glow"></div><img src="logo.png" alt="Rosa Makeup logo"></div>
+    <div class="eyebrow">BEAUTY • MAKEUP • PERFUMES</div>
+    <h1>Rosa Makeup</h1>
+    <p>Everything beautiful, in one place.</p>
+  </header>
+
+  <section class="links" aria-label="Rosa Makeup links">
+    <a class="link whatsapp" href="#" data-label="WhatsApp"><span class="icon">⌕</span><span>WhatsApp</span><b>↗</b></a>
+    <a class="link" href="#" data-label="Facebook"><span class="icon">f</span><span>Facebook</span><b>↗</b></a>
+    <a class="link" href="#" data-label="Instagram"><span class="icon">◎</span><span>Instagram</span><b>↗</b></a>
+    <a class="link" href="#" data-label="Call Al-Mansour"><span class="icon">⌕</span><span>Call Al-Mansour</span><b>↗</b></a>
+    <a class="link" href="#" data-label="Call Al-Adhamiya"><span class="icon">⌕</span><span>Call Al-Adhamiya</span><b>↗</b></a>
+  </section>
+
+  <div class="mini-card"><span class="dot"></span><span>Rosa Makeup IQ</span><span class="heart">♥</span></div>
+  <footer>© <span id="year"></span> Rosa Makeup · Baghdad</footer>
+</main>
+<script>
+const links=document.querySelectorAll('.link');
+links.forEach((el,i)=>{el.style.setProperty('--delay',(i*.08)+'s');el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();el.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');el.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%')})});
+document.getElementById('year').textContent=new Date().getFullYear();
+</script>
+</body></html>
